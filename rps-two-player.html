@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rock Paper Scissors – 2 Player Game Online</title>
+<meta name="description" content="Play Rock Paper Scissors with a friend on one screen. Both players pick in secret, then the countdown reveals the winner. Free 2 player game.">
+<style>
+:root{--bg:#fff7e6;--g1:#ffe3ec;--g2:#dff3ff;--card:#ffffffd9;--text:#2b2350;--muted:#6a6590;--p1:#f0561d;--p2:#1c7ed6;--line:#ffffff;--win:#2b9a4e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--card:#222226;--text:#f1f1f3;--muted:#a0a0a8;--p1:#ff8c5a;--p2:#6cb2ff;--line:#34343a;--win:#69db7c}}
+:root[data-theme="dark"]{--bg:#17171a;--card:#222226;--text:#f1f1f3;--muted:#a0a0a8;--p1:#ff8c5a;--p2:#6cb2ff;--line:#34343a;--win:#69db7c}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);background:linear-gradient(160deg,var(--g1),var(--g2)) fixed;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#2b1840;--g2:#10294a;--card:#241f3acc;--line:#4a4270}}
+:root[data-theme="dark"]{--g1:#2b1840;--g2:#10294a;--card:#241f3acc;--line:#4a4270}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+h1{text-align:center;font-size:1.7rem;margin:8px 0 2px;background:linear-gradient(90deg,var(--p1),#d6336c,var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{text-align:center;color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.score{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.sc{flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.sc b{display:block;font-size:2rem}
+.sc.p1 b,.sc.p1 span{color:var(--p1)}.sc.p2 b,.sc.p2 span{color:var(--p2)}
+.sc{box-shadow:0 4px 14px #0002}.sc.p1{border-top:5px solid var(--p1)}.sc.p2{border-top:5px solid var(--p2)}
+.arena{box-shadow:0 6px 20px #0002;background:linear-gradient(135deg,var(--card),color-mix(in srgb,var(--p1) 10%,var(--card)) 50%,color-mix(in srgb,var(--p2) 12%,var(--card)))}
+.panel{box-shadow:0 4px 14px #0002}
+.panel.p1{background:color-mix(in srgb,var(--p1) 8%,var(--card))}.panel.p2{background:color-mix(in srgb,var(--p2) 8%,var(--card))}
+.panel.p1 button.ch{border-color:var(--p1);background:color-mix(in srgb,var(--p1) 14%,var(--card))}
+.panel.p2 button.ch{border-color:var(--p2);background:color-mix(in srgb,var(--p2) 14%,var(--card))}
+.panel.p1 button.ch:hover:not(:disabled){background:var(--p1);color:#fff}
+.panel.p2 button.ch:hover:not(:disabled){background:var(--p2);color:#fff}
+.panel.p1 button.ch:hover kbd,.panel.p2 button.ch:hover kbd{color:var(--text)}
+#cvb{background:linear-gradient(90deg,var(--p1),var(--p2));color:#fff;border:0;font-weight:700}
+#reset{background:#7048e8;color:#fff;border:0;font-weight:600}
+.conf{position:fixed;top:-40px;font-size:1.7rem;pointer-events:none;z-index:50;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+.round{color:var(--muted);font-size:.85rem;text-align:center;min-width:70px}
+.arena{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.status{text-align:center;font-size:1.15rem;font-weight:600;min-height:1.6em;margin-bottom:10px}
+.hands{display:flex;justify-content:space-around;align-items:center;font-size:4.5rem;min-height:100px}
+.hand{transition:transform .15s}
+.shake{animation:sh .35s ease-in-out}
+@keyframes sh{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+.big{font-size:2.6rem;text-align:center;font-weight:800;min-height:3.2rem}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative}
+.cover{position:absolute;inset:0;z-index:5;background:var(--card);border:2px dashed var(--muted);border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px}
+.cover #cvt{font-size:1.2rem;font-weight:700;margin-bottom:4px}
+.cover .look{color:var(--muted);font-size:.85rem;margin-bottom:10px}
+@media (max-width:480px){.hands{font-size:3.4rem}}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.panel.p1{border-color:var(--p1)}.panel.p2{border-color:var(--p2)}
+.panel h2{margin:0 0 2px;font-size:1.05rem}
+.panel.p1 h2{color:var(--p1)}.panel.p2 h2{color:var(--p2)}
+.keys{font-size:.75rem;color:var(--muted);margin-bottom:8px}
+.state{font-size:.85rem;margin:6px 0 0;min-height:1.2em;color:var(--muted)}
+.btns{display:flex;flex-direction:column;gap:8px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:12px;padding:10px;font-size:1rem}
+button.ch{display:flex;justify-content:space-between;align-items:center}
+button.ch kbd{font-size:.75rem;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--muted)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.ch.on{background:var(--card);outline:3px solid currentColor}
+.panel.p1 button.ch.on{color:var(--p1)}.panel.p2 button.ch.on{color:var(--p2)}
+.ctrl{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.ctrl button{padding:9px 16px}
+.win{color:var(--win)}
+.arena{padding:6px 14px;margin-bottom:10px}
+.arena .status{font-size:1rem;min-height:1.2em;margin-bottom:0}
+.arena .big{font-size:1.5rem;min-height:1.7rem}
+.arena .hands{font-size:2.6rem;min-height:50px}
+.panel{padding:9px}
+.panel .av{width:56px;height:56px;margin-bottom:3px}
+.panel .keys{margin-bottom:5px}
+.panel .btns{gap:6px}
+.panel button.ch{padding:7px 10px}
+.panel .state{margin-top:4px}
+.av{width:68px;height:68px;display:block;margin:0 auto 6px;border-radius:50%;box-shadow:0 3px 10px #0003}
+.sc .av{width:44px;height:44px;margin:0 auto 4px}
+.cover .av{width:88px;height:88px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><clipPath id="avc"><circle cx="32" cy="32" r="32"/></clipPath>
+    <symbol id="av1" viewBox="0 0 64 64"><g clip-path="url(#avc)"><rect width="64" height="64" style="fill:color-mix(in srgb,var(--p1) 25%,#fff)"/><circle cx="32" cy="32" r="22" style="fill:var(--p1)"/><path d="M32 14l5.3 11 12 1.7-8.7 8.4 2.1 12L32 41.400l-10.700 5.700 2.100-12-8.700-8.400 12-1.700z" fill="#fff"/></g></symbol>
+    <symbol id="av2" viewBox="0 0 64 64"><g clip-path="url(#avc)"><rect width="64" height="64" style="fill:color-mix(in srgb,var(--p2) 25%,#fff)"/><circle cx="32" cy="32" r="22" style="fill:var(--p2)"/><path d="M36 13L21 35h10l-3 16 15-22H33z" fill="#fff"/></g></symbol></defs></svg>
+  <h1>✊ ✋ ✌️ Rock Paper Scissors</h1>
+  <p class="sub">2 players, 1 screen. Pick in secret, then the countdown reveals! Have fun, play fair 😄</p>
+
+  <div class="score">
+    <div class="sc p1"><svg class="av" viewBox="0 0 64 64"><use href="#av1"/></svg><span>Player 1</span><b id="s1">0</b></div>
+    <div class="round">Round <span id="rd">1</span><br>Draws: <span id="dr">0</span></div>
+    <div class="sc p2"><svg class="av" viewBox="0 0 64 64"><use href="#av2"/></svg><span>Player 2</span><b id="s2">0</b></div>
+  </div>
+
+  <div class="arena">
+    <div class="status" id="status">Both players: pick your move!</div>
+    <div class="big" id="count"></div>
+    <div class="hands"><div class="hand" id="h1">❔</div><div class="hand" id="h2">❔</div></div>
+  </div>
+
+  <div class="panels">
+    <div class="panel p1">
+      <svg class="av" viewBox="0 0 64 64"><use href="#av1"/></svg><h2>Player 1</h2><div class="keys">Keys: Q · W · E</div>
+      <div class="btns" id="b1"></div><div class="state" id="t1">Waiting…</div>
+    </div>
+    <div class="panel p2">
+      <svg class="av" viewBox="0 0 64 64"><use href="#av2"/></svg><h2>Player 2</h2><div class="keys">Keys: I · O · P</div>
+      <div class="btns" id="b2"></div><div class="state" id="t2">Waiting…</div>
+    </div>
+    <div class="cover" id="cover"><div><svg class="av" viewBox="0 0 64 64"><use id="cvu" href="#av1"/></svg><div id="cvt"></div><div class="look">Other player, eyes off the screen! Cheaters never win.</div><button id="cvb">Show my buttons</button></div></div>
+  </div>
+
+  <div class="ctrl"><button id="reset">Reset scores</button></div>
+</div>
+
+<script>
+const MOVES=[{n:"Rock",e:"✊"},{n:"Paper",e:"✋"},{n:"Scissors",e:"✌️"}];
+const KEYS={1:["q","w","e"],2:["i","o","p"]};
+let pick={1:null,2:null},busy=false,score={1:0,2:0,d:0},round=1;
+const $=id=>document.getElementById(id);
+
+function build(p){
+  const box=$("b"+p);
+  MOVES.forEach((m,i)=>{
+    const b=document.createElement("button");
+    b.className="ch";b.id=`c${p}${i}`;
+    b.innerHTML=`<span>${m.e} ${m.n}</span><kbd>${KEYS[p][i].toUpperCase()}</kbd>`;
+    b.onclick=()=>choose(p,i);
+    box.appendChild(b);
+  });
+}
+function burst(p){const NS="http://www.w3.org/2000/svg";for(let i=0;i<30;i++){const s=document.createElementNS(NS,"svg");s.setAttribute("viewBox","0 0 64 64");s.setAttribute("class","conf");const u=document.createElementNS(NS,"use");u.setAttribute("href","#av"+p);s.appendChild(u);const z=24+Math.random()*28;s.style.width=z+"px";s.style.height=z+"px";s.style.borderRadius="50%";s.style.left=Math.random()*92+"vw";s.style.animationDelay=Math.random()*.8+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),3500)}}
+let turn=1,covered=true;
+function showCover(){
+  covered=true;
+  $("cover").style.display="flex";
+  $("cvt").textContent=`Player ${turn}, it is your turn`;
+  $("cvu").setAttribute("href","#av"+turn);
+  $("status").textContent=`Player ${turn} is choosing…`;
+}
+$("cvb").onclick=()=>{covered=false;$("cover").style.display="none"};
+function choose(p,i){
+  if(busy||covered||p!==turn)return;
+  pick[p]=i; // stored in memory only, never shown on screen
+  $("t"+p).textContent="✅ Locked in (hidden)";
+  if(p===1){turn=2;showCover()}
+  else{covered=true;start()}
+}
+function lock(v){document.querySelectorAll(".ch").forEach(b=>b.disabled=v)}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+
+async function start(){
+  busy=true;lock(true);
+  $("status").textContent="Both ready! Get set…";
+  $("h1").textContent="✊";$("h2").textContent="✊";
+  for(const w of ["Rock…","Paper…","Scissors!"]){
+    $("count").textContent=w;
+    ["h1","h2"].forEach(id=>{const e=$(id);e.classList.remove("shake");void e.offsetWidth;e.classList.add("shake")});
+    await wait(750);
+  }
+  $("count").textContent="";
+  reveal();
+}
+function reveal(){
+  const a=pick[1],b=pick[2];
+  $("h1").textContent=MOVES[a].e;$("h2").textContent=MOVES[b].e;
+  let msg;
+  const p1wins=(a-b+3)%3===1;
+  if(a===b){score.d++;msg="🤝 It's a draw! Great minds think alike!"}
+  else{
+    if(p1wins){score[1]++;msg="🌟 Player 1 wins this round! Well played, Player 2 👏"}
+    else{score[2]++;msg="🌟 Player 2 wins this round! Well played, Player 1 👏"}
+  }
+  $("status").textContent=msg;if(a!==b)burst(p1wins?1:2);
+  $("t1").textContent=MOVES[a].n;$("t2").textContent=MOVES[b].n;
+  $("s1").textContent=score[1];$("s2").textContent=score[2];$("dr").textContent=score.d;
+  setTimeout(nextRound,2200);
+}
+function nextRound(){
+  round++;$("rd").textContent=round;
+  pick={1:null,2:null};busy=false;lock(false);
+  document.querySelectorAll(".ch").forEach(b=>b.classList.remove("on"));
+  $("t1").textContent="Waiting…";$("t2").textContent="Waiting…";
+  $("h1").textContent="❔";$("h2").textContent="❔";
+  turn=1;showCover();
+}
+$("reset").onclick=()=>{
+  score={1:0,2:0,d:0};round=0;
+  ["s1","s2","dr"].forEach(id=>$(id).textContent=0);
+  if(!busy)nextRound();else{/* applies after current round */}
+};
+document.addEventListener("keydown",e=>{
+  const k=e.key.toLowerCase();
+  [1,2].forEach(p=>{const i=KEYS[p].indexOf(k);if(i>-1)choose(p,i)});
+});
+build(1);build(2);showCover();
+</script>
+</body>
+</html>
